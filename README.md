@@ -1,0 +1,2 @@
+# TimLib
+./gradlew build
