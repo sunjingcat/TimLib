@@ -1,0 +1,792 @@
+syntax = "proto3";
+option java_package = "com.troila.im.gen";
+option java_multiple_files = true;
+option java_outer_classname = "TimService";
+
+/**
+*
+* TIM 消息服务
+*/
+service TimMessageService {
+
+    /**
+    * 客户端登录
+    * 登录成功后返回LoggedUser
+    * 后续请求Metadata需传入session-id
+    */
+    rpc login (LoginRequest) returns (Response) {
+    }
+
+    /**
+    * 客户端登出
+    */
+    rpc logout (LogoutRequest) returns (Response) {
+    }
+
+    /**
+    * 上行发送消息
+    * 接收客户端发送的消息并向下投递
+    * 投递成功后返回投递的Message信息
+    */
+    rpc sendMessage (SendMessageRequest) returns (Response) {
+    }
+
+    /**
+    * 发送心跳信息
+    */
+    rpc heartbeat (HeartbeatRequest) returns (Response) {
+    }
+
+    /**
+    * 监听下行消息
+    * 监听上行投递的消息，并将消息发送给所有在线的用户客户端
+    */
+    rpc listenRealtimeMessage (RealtimeMessageRequest) returns (stream Message) {
+    }
+
+    ///// 会话管理相关服务
+
+    /**
+    * 设置会话消息免打扰
+    * 设置成功后下发通知到用户的其它端
+    */
+    rpc setConversationMuteStatus (MuteConversationRequest) returns (Response) {
+    }
+
+    /**
+    * 设置会话置顶
+    * 设置成功后下发通知到用户的其它端
+    */
+    rpc setConversationStickyStatus (StickyConversationRequest) returns (Response) {
+    }
+
+    /**
+    * 删除服务端会话
+    * 设置成功后下发通知到用户的其它端
+    */
+    rpc removeRemoteConversation (RemoveConversationRequest) returns (Response) {
+    }
+
+    /**
+    * 获取服务端会话列表
+    * 返回当前用户所有会话
+    */
+    rpc getRemoteConversationList (ConversationListRequest) returns (Response) {
+    }
+
+    /**
+    * 获取最新消息
+    */
+    rpc getLatestConversationMessageList (LatestConversationMessageRequest) returns (Response) {
+    }
+
+    /**
+    * 根据消息ID同步会话消息
+    */
+    rpc syncConversationMessageList (SyncConversationMessageRequest) returns (Response) {
+    }
+
+    /**
+    * 根据消息最后更新时间同步会话消息
+    */
+    rpc syncConversationUpdateMessageList (SyncConversationUpdateMessageRequest) returns (Response) {
+    }
+
+    /**
+    * 同步最近几天的会话消息
+    */
+    rpc syncConversationDateMessageList (SyncConversationDateMessageRequest) returns (Response) {
+    }
+
+    /**
+    * 根据消息ID同步消息
+    */
+    rpc syncMessageList (SyncMessageRequest) returns (Response) {
+    }
+
+    /**
+    * 根据消息最后更新时间同步消息
+    */
+    rpc syncUpdateMessageList (SyncUpdateMessageRequest) returns (Response) {
+    }
+
+    /**
+    * 同步最近几天的消息
+    */
+    rpc syncDateMessageList (SyncDateMessageRequest) returns (Response) {
+    }
+
+    /**
+    * 根据消息ID获取当前消息
+    */
+    rpc getMessageById (MessageByIdRequest) returns (Response) {
+    }
+
+    /**
+    * 获取文件上传信息
+    * 返回文件上传URL等信息
+    */
+    rpc getFileUploadInfo (FileUploadRequest) returns (Response) {
+    }
+}
+
+
+message MessageByIdRequest {
+    string messageId = 1;
+}
+
+message FileUploadRequest {
+}
+
+message RealtimeMessageRequest {
+}
+
+/**
+* 登录请求
+*/
+message LoginRequest {
+    uint64 appId = 1;
+    string userId = 2;
+    string token = 3;
+    //用户平台
+    Platform platform = 4;
+    string osVersion = 5;
+    // 设备标识
+    string deviceToken = 6;
+
+    // SDK信息， 如： 1.1.0
+    string sdkVersion = 7;
+
+    string brand = 8;
+}
+
+/**
+* 登录用户信息
+*/
+message LoggedUser {
+    uint64 appId = 1;
+    string userId = 2;
+    string sessionId = 3;
+    // android | ios | ...
+    Platform platform = 4;
+    string osVersion = 5;
+
+    // SDK信息， 如： 1.1.0
+    string sdkVersion = 6;
+
+    string brand = 7;
+
+    uint64 loggedTime = 8;
+}
+
+/**
+* 登出请求
+*/
+message LogoutRequest {
+}
+
+/**
+* 发送心跳请求
+*/
+message HeartbeatRequest {
+    /**
+    * 心跳间隔, 单位：秒
+    */
+    uint64 interval = 1;
+}
+
+/**
+* 会话静音设置
+*/
+message MuteConversationRequest {
+
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 1;
+
+    string target = 2;
+    // 是否静音
+    bool mute = 3;
+}
+
+/**
+* 会话置顶设置
+*/
+message StickyConversationRequest {
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 1;
+
+    string target = 2;
+    // 是否置顶
+    bool sticky = 3;
+}
+
+/**
+* 删除会话请求
+*/
+message RemoveConversationRequest {
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 1;
+
+    // 对端ID
+    string targetId = 2;
+}
+
+/**
+* 同步会话请求
+*/
+message ConversationListRequest {
+    uint64 timestamp = 1;
+}
+
+message LatestConversationMessageRequest {
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 1;
+
+    // 对端ID
+    string targetId = 2;
+
+    uint64 timestamp = 3;
+
+    uint32 pageSize = 5;
+}
+
+/**
+* 根据消息ID同步会话消息请求
+*/
+message SyncConversationMessageRequest {
+
+    // 同步类型
+    SyncMessageType type = 1;
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 2;
+    // 对端ID
+    string targetId = 3;
+
+    string messageId = 4;
+
+    uint32 pageSize = 5;
+}
+
+/**
+* 根据消息最后更新时间同步会话消息请求
+*/
+message SyncConversationUpdateMessageRequest {
+    // 同步类型
+    SyncMessageType type = 1;
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 2;
+    // 对端ID
+    string targetId = 3;
+
+    uint64 timestamp = 4;
+
+    uint32 pageSize = 5;
+}
+
+/**
+* 同步最近几天的会话消息请求
+*/
+message SyncConversationDateMessageRequest {
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 1;
+    // 对端ID
+    string targetId = 2;
+
+    //同步天数
+    uint32 dayNum = 3;
+
+    uint32 pageNum = 4;
+
+    uint32 pageSize = 5;
+
+}
+
+/**
+* 根据消息ID同步消息请求
+*/
+message SyncMessageRequest {
+
+    // 同步类型
+    SyncMessageType type = 1;
+
+    string messageId = 2;
+
+    uint32 pageSize = 3;
+}
+
+/**
+* 根据消息最后更新时间同步消息请求
+*/
+message SyncUpdateMessageRequest {
+
+    // 同步类型
+    SyncMessageType type = 1;
+
+    // 消息的更新时间戳
+    uint64 timestamp = 2;
+
+    uint32 pageSize = 3;
+}
+
+/**
+* 同步最近几天的消息请求
+*/
+message SyncDateMessageRequest {
+
+    //同步天数
+    uint32 dayNum = 3;
+
+    uint32 pageNum = 4;
+
+    uint32 pageSize = 5;
+}
+
+////枚举类
+/**
+* 同步消息类型
+*/
+enum SyncMessageType {
+    // 传入消息ID 向前同步
+    FORWARD = 0;
+    // 传入消息ID 向后同步
+    BACKWARD = 1;
+}
+
+/**
+* 平台类型
+*/
+enum Platform {
+    ANDROID = 0;
+    IOS = 1;
+    WEB = 2;
+    PC = 3;
+    SYMBIAN = 4;
+    LINUX = 5;
+    BLACKBERRY = 6;
+    WINDOWSMOBILE = 7;
+    PALM = 8;
+}
+
+/**
+* 消息类型
+*/
+enum MessageType {
+    //内容类消息
+    CONTENT = 0;
+    //状态类消息
+    STATUS = 1;
+    //命令类消息
+    COMMAND = 2;
+    //通知类消息
+    NOTIFICATION = 3;
+}
+
+/**
+* 上行消息
+*
+* 服务端接收之后需要经过加工、处理然后做持久化和在线下发
+*/
+message SendMessageRequest {
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 1;
+
+    /*
+    * 消息类型:
+    * CONTENT,STATUS,COMMAND
+    */
+    MessageType type = 2;
+
+    string receiver = 3;
+    oneof content {
+        Command command = 4;
+        ContentMessage contentMessage = 5;
+        Status status = 6;
+    }
+    // 额外扩展字段
+    string extra = 15;
+}
+
+/**
+* 下行消息
+*
+* 实时接收到的消息， 客户端接收之后需要经过加工、处理并存储为本地消息模型
+*/
+message Message {
+
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string conversationType = 1;
+    // 消息ID
+    string id = 2;
+
+    /*
+    * 消息类型:
+    * CONTENT,STATUS,NOTIFICATION
+    */
+    MessageType type = 3;
+
+    // 发送人ID
+    string sender = 4;
+
+    // 发送时间
+    uint64 sendTime = 5;
+
+    // 接收端ID， 单聊时为接受者userId， 群聊时为群组id
+    string target = 6;
+    oneof content {
+        Notification notification = 7;
+        ContentMessage contentMessage = 8;
+        Status status = 9;
+    }
+    //服务器下发时间
+    uint64 dispatTime = 10;
+    // 额外扩展字段
+    string extra = 15;
+}
+
+/**
+* 内容类消息
+*/
+message ContentMessage {
+    bool receiptRequired = 1;
+    /**
+    * 内容类消息类型
+    * MT:Text
+    * MT:Image
+    * MT:Gif
+    * MT:Voice
+    * MT:News
+    * MT:File
+    * MT:Location
+    * 其他字符串则代表自定义消息类型
+    */
+    string type = 2;
+
+    // 更新时间
+    uint64 updateTime = 3;
+
+    // 消息撤回
+    bool recalled = 4;
+
+    // 消息是否已读
+    bool read = 5;
+
+    /**
+    * 消息已读状态
+    * 发送人会收到
+    * 单聊:
+    *   readBitMask = [ 0 ] 未读
+    *   readBitMask = [ 1 ] 已读
+    * 群聊:
+    *   数组每个元素代表群组成员位,最大表示50人已读状态.
+    *   二进制位图由右到左表示成员位
+    * 例子:
+    *   readBitMask = [ 30, 5]
+    *   30       5
+    *   11110    101
+    *   memberId为2,3,4,5的和51,53的成员已读
+    *
+    */
+    repeated uint64 readBitMask = 6;
+
+    /**
+    * 群成员位图
+    * 发送人会收到
+    * 二进制位图由右到左表示成员位
+    * 例：
+    *   userId-memberId
+    *   user_1-1
+    *   user_2-2
+    *   user_3-3
+    *   user_4-4
+    *   user_5-5
+    *
+    *   user_6-51
+    *   user_8-52
+    *   user_9-53
+    *
+    *   groupSnapshot = [31,7]
+    *   二进制位图
+    *   11111  111
+    *
+    *   user_4 user_8 退出群组后
+    *   groupSnapshot = [23,5]
+    *   二进制位图
+    *   10111  101
+    */
+    repeated uint64 groupSnapshot = 7;
+
+    // 推送标题
+    string pushTitle = 8;
+
+    // 推送内容
+    string pushContent = 9;
+
+    oneof content {
+        TextMessage text = 11;
+        ImageMessage image = 12;
+        GifMessage gif = 13;
+        VoiceMessage voice = 14;
+        NewsMessage news = 15;
+        FileMessage file = 16;
+        LocationMessage location = 17;
+
+        // 自定义消息
+        CustomMessage custom = 18;
+    }
+
+}
+
+/**
+* 状态消息
+*/
+message Status {
+    /**
+    * 状态
+    * ST:Typing
+    */
+    string type = 1;
+    string data = 2;
+}
+
+/**
+* 文本消息
+*/
+message TextMessage {
+    string content = 1;
+    oneof mentionInfo {
+        MentionDetails mentionDetails = 2;
+        bool receiverMentioned = 3;
+    }
+}
+
+/**
+* 群聊 @ 人信息
+*/
+message MentionDetails {
+    bool mentionAll = 1;
+    repeated string mentionedMembers = 2;
+}
+
+/**
+* 图片消息
+*/
+message ImageMessage {
+
+    // base64
+    string content = 1;
+
+    uint64 size = 2;
+
+    uint32 width = 3;
+
+    uint32 height = 4;
+
+    string url = 5;
+
+    // 是否发送原图
+    bool isOriginal = 6;
+}
+
+/**
+* GIF图片消息
+*/
+message GifMessage {
+
+    uint64 size = 1;
+
+    uint32 width = 2;
+
+    uint32 height = 3;
+
+    string url = 4;
+}
+
+/**
+* 语音消息
+*/
+message VoiceMessage {
+    string content = 1;
+    uint32 duration = 2;
+}
+
+/**
+* 图文消息
+*/
+message NewsMessage {
+    string title = 1;
+    string description = 2;
+    string url = 3;
+    string logoUrl = 4;
+}
+
+/**
+* 位置消息
+*/
+message LocationMessage {
+    // 位置缩略图 base64
+    string thumb = 1;
+    double lat = 2;
+    double lng = 3;
+    string title = 4;
+}
+
+/**
+* 文件消息
+*/
+message FileMessage {
+    string name = 1;
+    uint64 size = 2;
+    string url = 3;
+    string mimeType = 4;
+}
+
+/**
+* 自定义消息
+*/
+message CustomMessage {
+    string data = 1;
+}
+
+/**
+* 通知
+*/
+message Notification {
+    /**
+    * 通知类型
+    * NT:GroupCreated
+    * NT:GroupDismissed
+    * NT:GroupMemberJoined
+    * NT:GroupMemberQuited
+    * NT:GroupRenamed
+    * NT:GroupMemberKicked
+    * NT:ConversationMuteUpdated
+    * NT:ConversationStickyUpdated
+    * NT:ConversationRemoved
+    * NT:MessageRecalled
+    * NT:MessageRead
+    */
+    string type = 1;
+    string data = 2;
+}
+
+/**
+* 命令
+*/
+message Command {
+    /**
+    * 命令类型
+    * CMD:RecallMessage
+    * CMD:ReadMessage
+    *
+    */
+    string type = 1;
+    string data = 2;
+}
+
+/**
+* 会话
+*/
+message Conversation {
+
+    /**
+     * 会话类型
+     * CT:Private
+     * CT:Group
+     */
+    string type = 1;
+    //对端ID
+    string targetId = 2;
+    /**
+    * 置顶状态
+    * 0/时间戳
+    * 以时间戳顺序排列置顶顺序
+    */
+    uint64 sticky = 3;
+    /**
+    * 静音状态
+    */
+    bool muted = 4;
+    /**
+    * 删除状态
+    */
+    bool deleted = 5;
+}
+
+message ConversationList {
+    repeated Conversation content = 1;
+}
+
+message MessageList {
+    repeated Message content = 1;
+}
+
+message Response {
+    /**
+    * 0:    成功
+    * 1001 ~ 1999: 客户端错误
+    * 1001: APP不存在
+    * 1002: APP已禁用
+    * 1003: 非法用户
+    * 1010: 用户不存在
+    * 1011: 用户已禁用
+    * 1013: 用户Session失效
+    * 1014: 参数异常
+    * 1015: 服务端异常
+    * 2001 ~ 2999: 业务逻辑错误
+    * 3001 ~ 3999: 服务端错误
+    */
+    uint32 code = 1;
+    string message = 2;
+    oneof data {
+        ConversationList conversations = 3;
+        MessageList messages = 4;
+        Message sentMessage = 5;
+        /**
+        * 登录接口返回当前登录的用户
+        */
+        LoggedUser loggedUser = 6;
+        string fileUploadInfo = 7;
+    }
+}
+
+
+
+
+
+
