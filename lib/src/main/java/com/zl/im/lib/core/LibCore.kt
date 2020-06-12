@@ -2,13 +2,21 @@ package com.zl.im.lib.core
 
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
+import com.google.common.util.concurrent.FutureCallback
+
+import com.google.common.util.concurrent.Futures
 import com.troila.im.gen.LoginRequest
 import com.troila.im.gen.Platform
+import com.troila.im.gen.Response
+import com.troila.im.gen.TimMessageServiceGrpc
 import com.zl.im.lib.BuildConfig
 import com.zl.im.lib.listener.ConnectionStatusChangeListener
 import com.zl.im.lib.utils.LogUtils
+import io.grpc.Grpc
+import io.grpc.ManagedChannelBuilder
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
+
 
 class LibCore(appId: String, uploadMethod: String, debug: Boolean, host: String) {
     val version = "0.0.1"
@@ -92,6 +100,29 @@ class LibCore(appId: String, uploadMethod: String, debug: Boolean, host: String)
                 .setDeviceToken("唯一标识")
                 .setSdkVersion(version).build();
 
+    }
+    fun request(loginRequest:LoginRequest){
+      val  mChannel = ManagedChannelBuilder.forAddress(this.hostConfig, 8080)
+                .usePlaintext()
+                .build();
+        mChannel.getState(true)
+        mChannel.notifyWhenStateChanged(mChannel.getState(true), Runnable {
+            kotlin.run {
+                LogUtils.v("连接状态发生变化")
+            }
+        })
+        val login = TimMessageServiceGrpc.newFutureStub(mChannel).login(loginRequest)
+        Futures.addCallback(login, object: FutureCallback<Response>{
+            override fun onSuccess(result: Response?) {
+                TODO("Not yet implemented")
+//                result.code==  TODO 写到这里啦
+            }
+
+            override fun onFailure(t: Throwable) {
+                TODO("Not yet implemented")
+            }
+
+        },null)
     }
 
 
