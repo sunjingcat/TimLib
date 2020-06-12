@@ -2,6 +2,11 @@ package com.zl.im.lib.core
 
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
+import com.troila.im.gen.LoginRequest
+import com.troila.im.gen.Platform
+import com.zl.im.lib.BuildConfig
+import com.zl.im.lib.listener.ConnectionStatusChangeListener
+import com.zl.im.lib.utils.LogUtils
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
 
@@ -36,6 +41,10 @@ class LibCore(appId: String, uploadMethod: String, debug: Boolean, host: String)
         }
     }
 
+    var connectionStatusChangeListener: ConnectionStatusChangeListener = TODO()
+        set(value) {
+            field = value
+        }
     var appId = ""
     var uploadMethod = "local"
     var userId = ""
@@ -53,15 +62,36 @@ class LibCore(appId: String, uploadMethod: String, debug: Boolean, host: String)
         this.hostConfig = host
     }
 
-    fun getHost() : String{
-        if (this.hostConfig.isNotEmpty()){
+    fun getHost(): String {
+        if (this.hostConfig.isNotEmpty()) {
             return this.hostConfig
         }
         return "http://172.27.104.2"
     }
-    fun getMetadata() : Map<String,String>{
+
+    fun getMetadata(): Map<String, String> {
         var map = mapOf("Session-Id" to this.sessionId)
         return map
+    }
+
+    fun login() {
+        LogUtils.v("'start login'")
+        this.connectionStatusChangeListener.onConnectionStatusChanged(ConnectionStatusType.connecting)
+        val loginRequest = loginRequest(this.userId, this.token)
+
+        //request 方法
+
+
+    }
+    fun loginRequest(userId:String, token:String):LoginRequest{
+        return  LoginRequest.newBuilder().setAppId(this.appId.toLong())
+                .setUserId(userId)
+                .setToken(token)
+                .setPlatform(Platform.ANDROID)
+                .setOsVersion(BuildConfig.VERSION_NAME)
+                .setDeviceToken("唯一标识")
+                .setSdkVersion(version).build();
+
     }
 
 
