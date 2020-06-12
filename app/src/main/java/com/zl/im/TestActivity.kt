@@ -13,7 +13,7 @@ class TestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
         btn_init.setOnClickListener(View.OnClickListener {
-            LogUtils.v(""+Conversion.ConversionType.GROUP)
+            LogUtils.v(""+Conversion.ConnectionStatusType.connected)
         })
     }
 }
