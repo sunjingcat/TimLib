@@ -4,9 +4,7 @@ import android.content.Context
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
 import com.blankj.utilcode.util.NetworkUtils
-import com.blankj.utilcode.util.ThreadUtils
 import com.google.common.util.concurrent.FutureCallback
-
 import com.google.common.util.concurrent.Futures
 import com.troila.im.gen.LoginRequest
 import com.troila.im.gen.Platform
@@ -16,7 +14,7 @@ import com.zl.im.lib.BuildConfig
 import com.zl.im.lib.listener.ConnectionStatusChangeListener
 import com.zl.im.lib.realm.RealmConfig
 import com.zl.im.lib.utils.LogUtils
-import io.grpc.Grpc
+import io.grpc.ClientInterceptor
 import io.grpc.ManagedChannelBuilder
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
@@ -100,6 +98,7 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
         } catch (e: Exception){
 
         }
+        login()
         this.netInfoHandle()
 //        this.appStateHandle()
     }
@@ -171,8 +170,9 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
     }
     fun login() {
         LogUtils.v("'start login'")
-        this.connectionStatusChangeListener.onConnectionStatusChanged(ConnectionStatusType.connecting)
+//        this.connectionStatusChangeListener.onConnectionStatusChanged(ConnectionStatusType.connecting)
         val loginRequest = loginRequest(this.userId, this.token)
+        request(loginRequest)
         //request 方法
 
     }
@@ -192,6 +192,8 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
         val mChannel = ManagedChannelBuilder.forAddress(this.hostConfig, 8080)
                 .usePlaintext()
                 .build();
+
+//        val interceptor: ClientInterceptor = HeaderClientInterceptor(headerMap)
         mChannel.getState(true)
         mChannel.notifyWhenStateChanged(mChannel.getState(true), object : Runnable {
             override fun run() {
@@ -213,6 +215,5 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
 
         }, null)
     }
-
 
 }
