@@ -14,7 +14,6 @@ import com.zl.im.lib.BuildConfig
 import com.zl.im.lib.listener.ConnectionStatusChangeListener
 import com.zl.im.lib.realm.RealmConfig
 import com.zl.im.lib.utils.LogUtils
-import io.grpc.ClientInterceptor
 import io.grpc.ManagedChannelBuilder
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
