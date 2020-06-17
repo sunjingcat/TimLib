@@ -75,9 +75,9 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
     var connectionStatus = ConnectionStatusType.disconnect
     var loginStatus = false
     var hostConfig = ""
-    var  netInfoIsConnected = false
-    var  connectCount = 0
-    var  maxReconnectCount = 3
+    var netInfoIsConnected = false
+    var connectCount = 0
+    var maxReconnectCount = 3
 
     init {
         this.appId = appId
@@ -90,7 +90,7 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
         if (this.hostConfig.isNotEmpty()) {
             return this.hostConfig
         }
-        return "http://172.27.104.2/"
+        return "http://devtim.idaka.vip:8001"
     }
 
     fun getMetadata(): Map<String, String> {
@@ -98,51 +98,54 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
         return map
     }
 
-    fun connectWithTokenAndUserId(context: Context,userId:String, token:String, deviceToken:String) {
+    fun connectWithTokenAndUserId(context: Context, userId: String, token: String, deviceToken: String) {
         this.userId = userId
         this.token = token
         this.deviceToken = deviceToken
         try {
-            RealmConfig.init(context,userId)
-        } catch (e: Exception){
+            RealmConfig.init(context, userId)
+        } catch (e: Exception) {
 
         }
         login()
         this.netInfoHandle()
 //        this.appStateHandle()
     }
-    fun  netInfoHandle  ()  {
-        NetworkUtils.isRegisteredNetworkStatusChangedListener(object :NetworkUtils.OnNetworkStatusChangedListener{
+
+    fun netInfoHandle() {
+        NetworkUtils.isRegisteredNetworkStatusChangedListener(object : NetworkUtils.OnNetworkStatusChangedListener {
             override fun onConnected(networkType: NetworkUtils.NetworkType?) {
                 LogUtils.d("netInfo change: isConnected")
                 resetConnectCount()
                 netInfoIsConnected = true
-                if (!netInfoIsConnected){
+                if (!netInfoIsConnected) {
                     if (loginStatus) {
                         connect()
                     } else {
                         login()
                     }
                 }
-                LogUtils.v("netInfo change: isConnected"+true)
+                LogUtils.v("netInfo change: isConnected" + true)
             }
 
             override fun onDisconnected() {
                 resetConnectCount()
                 netInfoIsConnected = false
-                if (loginStatus){
+                if (loginStatus) {
                     close()
                 }
-                LogUtils.v("netInfo change: isConnected"+false)
+                LogUtils.v("netInfo change: isConnected" + false)
             }
 
         })
     }
-    fun resetConnectCount () {
+
+    fun resetConnectCount() {
         this.connectCount = 0
     }
-    fun connect () {
-        LogUtils.v("connectCount"+this.connectCount)
+
+    fun connect() {
+        LogUtils.v("connectCount" + this.connectCount)
         if (this.connectCount > this.maxReconnectCount) {
             LogUtils.v("connect count over max connect count")
             return
@@ -154,12 +157,14 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
         this.syncMessage()
 //        this.syncConversationListStatus()
     }
-    fun close () {
+
+    fun close() {
         LogUtils.v("close connect")
 //        this.clearHeartbeat()
 //        this.closeListener()
 //        this.onConnectionStatusChanged(Core.connectionStatusType.disconnect)
     }
+
     fun heartbeat() {
 //        ThreadUtils.executeBySingleAtFixRate(object :ThreadUtils.Task)
 //        this.heartbeatTimer && clearInterval(this.heartbeatTimer)
@@ -170,13 +175,16 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
 //            this.log.debug('heartbeat', res.getCode())
 //        }, 5000)
     }
-    fun syncMessage (){
+
+    fun syncMessage() {
 
     }
-    fun createListenerRealtimeMessage () {
+
+    fun createListenerRealtimeMessage() {
         LogUtils.v("createListenerRealtimeMessage")
 
     }
+
     fun login() {
         LogUtils.v("'start login'")
 //        this.connectionStatusChangeListener.onConnectionStatusChanged(ConnectionStatusType.connecting)
@@ -198,12 +206,12 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
 
     }
 
-    fun request1(loginRequest: LoginRequest){
+    fun request1(loginRequest: LoginRequest) {
         Observable.create(object : ObservableOnSubscribe<Response> {
             @Throws(java.lang.Exception::class)
             override fun subscribe(emitter: ObservableEmitter<Response>) {
-                val uri = URI.create(hostConfig).host;
-                val mChannel = ManagedChannelBuilder.forTarget(uri)
+                val uri = URI.create(hostConfig);
+                val mChannel = ManagedChannelBuilder.forTarget(uri.authority)
                         .usePlaintext()
                         .build();
 
@@ -212,16 +220,16 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
                 mChannel.notifyWhenStateChanged(mChannel.getState(true), object : Runnable {
                     override fun run() {
                         LogUtils.v("连接状态发生变化")
-
                     }
 
                 })
                 val login = TimMessageServiceGrpc.newBlockingStub(mChannel).login(loginRequest)
                 emitter.onNext(login)
+
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Response>{
+                .subscribe(object : Observer<Response> {
                     override fun onSubscribe(d: Disposable) {
                         LogUtils.v("onSubscribe")
                     }
@@ -233,7 +241,7 @@ class LibCore(context: Context, appId: String, uploadMethod: String, debug: Bool
                     }
 
                     override fun onError(e: Throwable) {
-                        LogUtils.v("onError",e.message)
+                        LogUtils.v("onError", e.message)
                     }
 
                     override fun onComplete() {

@@ -21,7 +21,7 @@ class TestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
         btn_init.setOnClickListener(View.OnClickListener {
-            TimLib.initWithAppKey(this, testAppKey, uploadMethod, true, "http://172.27.104.2")
+            TimLib.initWithAppKey(this, testAppKey, uploadMethod, true, "http://devtim.idaka.vip:8001")
             init = true;
         })
         btn_connect.setOnClickListener {
