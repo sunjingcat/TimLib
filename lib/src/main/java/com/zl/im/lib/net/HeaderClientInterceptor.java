@@ -24,7 +24,7 @@ import io.grpc.MethodDescriptor;
  * @create_time 2016/7/7 11:02
  */
 
-class HeaderClientInterceptor implements ClientInterceptor {
+public class HeaderClientInterceptor implements ClientInterceptor {
 
     private static final String TAG = "HeaderClientInterceptor";
 
